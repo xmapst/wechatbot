@@ -81,15 +81,20 @@ func (h *UserMessageHandler) ReplyText() error {
 		logrus.Info("user message is null")
 		return nil
 	}
-	reply := gpt.Completions(requestText)
-	requestText = append(requestText, reply)
-	h.service.SetUserSessionContext(requestText)
 	// 2.向GPT发起请求，如果回复文本等于空,不回复
-	if h.sender.IsSelf() && h.msg.ToUserName == openwechat.FileHelper {
+	if h.msg.ToUserName == openwechat.FileHelper {
 		// 2.1 回复文件助手
+        reply := gpt.Completions(requestText)
+        logrus.Info(fmt.Sprintf("Reply User %v Text Msg: %v", h.sender.NickName, reply.Content))
+        requestText = append(requestText, reply)
+        h.service.SetUserSessionContext(requestText)
 		_, err = h.sender.Self().FileHelper().SendText(buildUserReply(reply.Content))
 	} else if !h.sender.IsSelf() {
 		// 2.2 设置上下文，回复用户
+        reply := gpt.Completions(requestText)
+        logrus.Info(fmt.Sprintf("Reply User %v Text Msg: %v", h.sender.NickName, reply.Content))
+        requestText = append(requestText, reply)
+        h.service.SetUserSessionContext(requestText)
 		_, err = h.msg.ReplyText(buildUserReply(reply.Content))
 	}
 	if err != nil {

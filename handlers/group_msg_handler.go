@@ -99,6 +99,7 @@ func (g *GroupMessageHandler) ReplyText() error {
 
 	// 3.请求GPT获取回复
 	reply := gpt.Completions(requestText)
+    logrus.Infof("Reply User %v From Group %v Text Msg: %v", g.sender.NickName, g.group.NickName, reply.Content)
 	// 4.设置上下文，并响应信息给用户
 	requestText = append(requestText, reply)
 	g.service.SetUserSessionContext(requestText)
